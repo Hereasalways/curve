@@ -55,13 +55,19 @@ struct SpaceAllocServerOption {
 };
 
 
+struct S3Option {
+    std::string ak;
+    std::string sk;
+    std::string endpoint;
+    std::string bucketname;
+};
+
 struct FuseClientOption {
     MdsOption mdsOpt;
     MetaServerOption metaOpt;
     SpaceAllocServerOption spaceOpt;
     BlockDeviceClientOptions bdevOpt;
 };
-
 
 void InitFuseClientOption(Configuration *conf,
     FuseClientOption *clientOption);

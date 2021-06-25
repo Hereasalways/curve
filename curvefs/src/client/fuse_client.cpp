@@ -52,10 +52,15 @@ CURVEFS_ERROR FuseClient::GetMointPoint(
 
 void FuseClient::init(void *userdata, struct fuse_conn_info *conn) {
     struct MountOption *mOpts = (struct MountOption *) userdata;
-    std::string volName = mOpts->volume;
-    std::string fsName = mOpts->volume;
-    std::string user = mOpts->user;
     std::string mountPointStr = mOpts->mountPoint;
+    std::string fsTypeStr = mOpts->fsType;
+    std::string fsName = mOpts->fsName;
+    std::string volName = mOpts->volume;
+    std::string user = mOpts->user;
+
+    if (fsName.empty()) {
+        fsName = volName;
+    }
 
     FsInfo fsInfo;
     CURVEFS_ERROR ret = mdsClient_->GetFsInfo(fsName, &fsInfo);
@@ -64,23 +69,30 @@ void FuseClient::init(void *userdata, struct fuse_conn_info *conn) {
             LOG(INFO) << "The fsName not exist, try to CreateFs"
                       << ", fsName = " << fsName;
 
-            BlockDeviceStat stat;
-            ret = blockDeviceClient_->Stat(volName, user, &stat);
-            if (ret != CURVEFS_ERROR::OK) {
-                LOG(ERROR) << "Stat volume failed, ret = " << ret
-                           << ", volName = " << volName
-                           << ", user = " << user;
-                return;
+            if (fsTypeStr == "s3") {
+                S3Info s3Info;
+
+                ret = mdsClient_->CreateFs(fsName, 4096, s3Info);
+            } else {
+                BlockDeviceStat stat;
+                ret = blockDeviceClient_->Stat(volName, user, &stat);
+                if (ret != CURVEFS_ERROR::OK) {
+                    LOG(ERROR) << "Stat volume failed, ret = " << ret
+                               << ", volName = " << volName
+                               << ", user = " << user;
+                    return;
+                }
+
+                Volume vol;
+                vol.set_volumesize(stat.length);
+                // TODO(xuchaojie) : where to get block size?
+                vol.set_blocksize(4096);
+                vol.set_volumename(volName);
+                vol.set_user(user);
+
+                ret = mdsClient_->CreateFs(fsName, 4096, vol);
             }
 
-            Volume vol;
-            vol.set_volumesize(stat.length);
-            // TODO(xuchaojie) : where to get block size?
-            vol.set_blocksize(4096);
-            vol.set_volumename(volName);
-            vol.set_user(user);
-
-            ret = mdsClient_->CreateFs(fsName, 0, vol);
             if (ret != CURVEFS_ERROR::OK) {
                 LOG(ERROR) << "CreateFs failed, ret = " << ret
                            << ", fsName = " << fsName

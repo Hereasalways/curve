@@ -35,12 +35,20 @@ extern "C" {
 
 struct MountOption {
     const char* mountPoint;
+    const char* fsName;
+    const char* fsType;
     const char* volume;
     const char* user;
     const char* conf;
 };
 
 static const struct fuse_opt mount_opts[] = {
+    { "fsname=%s",
+      offsetof(struct MountOption, fsName), 0},
+
+    { "fstype=%s",
+      offsetof(struct MountOption, fsType), 0},
+
     { "volume=%s",
       offsetof(struct MountOption, volume), 0},
 

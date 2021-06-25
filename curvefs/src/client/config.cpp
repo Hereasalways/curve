@@ -58,11 +58,17 @@ void InitBlockDeviceOption(Configuration *conf,
     LOG_IF(FATAL, !conf->GetStringValue("bdev.confpath", &bdevOpt->configPath));
 }
 
+void InitS3Option(Configuration *conf,
+    S3Option *s3Opt) {
+    LOG_IF(FATAL, !conf->)
+}
 
 void SetBrpcOpt(Configuration *conf) {
     LOG_IF(FATAL, !conf->GetIntValue("defer.close.second",
                                      brpc::FLAGS_defer_close_second));
 }
+
+
 
 void InitFuseClientOption(Configuration *conf, FuseClientOption *clientOption) {
     InitMdsOption(conf, &clientOption->mdsOpt);

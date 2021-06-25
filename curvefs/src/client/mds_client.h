@@ -51,6 +51,10 @@ class MdsClient {
                                    uint64_t blockSize,
                                    const Volume &volume) = 0;
 
+    virtual CURVEFS_ERROR CreateFs(const std::string &fsName,
+                                   uint64_t blockSize,
+                                   const S3Info &s3Info) = 0;
+
     virtual CURVEFS_ERROR DeleteFs(const std::string &fsName) = 0;
 
     virtual CURVEFS_ERROR MountFs(const std::string &fsName,
@@ -78,6 +82,9 @@ class MdsClientImpl : public MdsClient {
 
     CURVEFS_ERROR CreateFs(const std::string &fsName, uint64_t blockSize,
                            const Volume &volume) override;
+
+    CURVEFS_ERROR CreateFs(const std::string &fsName, uint64_t blockSize,
+                           const S3Info &s3Info) override;
 
     CURVEFS_ERROR DeleteFs(const std::string &fsName) override;
 
