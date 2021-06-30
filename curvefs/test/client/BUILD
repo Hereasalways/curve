@@ -37,6 +37,7 @@ COPTS = [
     "-Wnon-virtual-dtor",
     "-Wno-missing-field-initializers",
     "-std=c++11",
+    "-g",
 ]
 
 cc_test(
@@ -56,25 +57,25 @@ cc_test(
     ],
 )
 
-#cc_binary(
-#    name = "fuse_client_test",
-#    srcs = glob([
-#        "*.cpp",
-#        "*.c",
-#        "*.h"],
-#        exclude = [ "block_device_client_test.cpp" ]
-#    ),
-#    copts = ["-I/usr/local/include/fuse3",
-#             "-L/usr/local/lib/x86_64-linux-gnu"],
-#    deps = [
-#        "//external:gtest",
-#        "//curvefs/src/client:fuse_client_lib",
-#        "//curvefs/proto:metaserver_cc_proto",
-#        "//curvefs/proto:mds_cc_proto",
-#        "//curvefs/proto:space_cc_proto",
-#    ],
-#    linkopts = ["-lfuse3",
-#                "-lpthread",
-#                "-L/usr/local/lib/x86_64-linux-gnu"],
-#    visibility = ["//visibility:public"],
-#)
+
+cc_test(
+    name = "fuse_client_test",
+    srcs = glob([
+        "*.cpp",
+        "*.c",
+        "*.h"],
+        exclude = [ "block_device_client_test.cpp" ]
+    ),
+    copts = ["-I/usr/local/include/fuse3",
+             "-L/usr/local/lib/x86_64-linux-gnu"],
+    deps = [
+        "//include/client:include_client",
+        "//curvefs/src/client:fuse_client_lib",
+        "//test/client/mock:client_mock_lib",
+        "@com_google_googletest//:gtest",
+        "@com_google_googletest//:gtest_main",
+        "//curvefs/proto:metaserver_cc_proto",
+        "//curvefs/proto:mds_cc_proto",
+        "//curvefs/proto:space_cc_proto",
+    ],
+)
